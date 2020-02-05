@@ -57,7 +57,7 @@ class ViewController: UIViewController {
         button.setTitle("Move square left", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.backgroundColor = .cyan
-        button.addTarget(self, action: #selector(animateSquareDown(sender:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(animateSquareLeft(sender:)), for: .touchUpInside)
         return button
     }()
     
@@ -66,8 +66,26 @@ class ViewController: UIViewController {
         button.setTitle("Move square right", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.backgroundColor = .cyan
-        button.addTarget(self, action: #selector(animateSquareDown(sender:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(animateSquareRight(sender:)), for: .touchUpInside)
         return button
+    }()
+    
+    lazy var durationStepper: UIStepper = {
+       let stepper = UIStepper()
+        stepper.minimumValue = 0.0
+        stepper.maximumValue = 4.0
+        stepper.stepValue = 0.5
+        print(stepper.value)
+        return stepper
+    }()
+    
+    lazy var distanceStepper: UIStepper = {
+       let stepper = UIStepper()
+        stepper.minimumValue = 0.0
+        stepper.maximumValue = 200.0
+        stepper.stepValue = 10.0
+        print(stepper.value)
+        return stepper
     }()
     
     lazy var blueSquareHeightConstaint: NSLayoutConstraint = {
@@ -94,24 +112,32 @@ class ViewController: UIViewController {
     
     @IBAction func animateSquareUp(sender: UIButton) {
         let oldOffset = blueSquareCenterYConstraint.constant
-        blueSquareCenterYConstraint.constant = oldOffset - 150
-        UIView.animate(withDuration: 2) { [unowned self] in
+        blueSquareCenterYConstraint.constant = oldOffset - CGFloat(distanceStepper.value)
+        UIView.animate(withDuration: durationStepper.value) { [unowned self] in
             self.view.layoutIfNeeded()
         }
     }
     
     @IBAction func animateSquareDown(sender: UIButton) {
         let oldOffet = blueSquareCenterYConstraint.constant
-        blueSquareCenterYConstraint.constant = oldOffet + 150
-        UIView.animate(withDuration: 2) { [unowned self] in
+        blueSquareCenterYConstraint.constant = oldOffet + CGFloat(distanceStepper.value)
+        UIView.animate(withDuration: durationStepper.value) { [unowned self] in
             self.view.layoutIfNeeded()
         }
     }
     
     @IBAction func animateSquareLeft(sender: UIButton) {
         let oldOffset = blueSquareCenterXConstraint.constant
-        blueSquareCenterYConstraint.constant = oldOffset - 150
-        UIView.animate(withDuration: 2) { [unowned self] in
+        blueSquareCenterXConstraint.constant = oldOffset - CGFloat(distanceStepper.value)
+        UIView.animate(withDuration: durationStepper.value) { [unowned self] in
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    @IBAction func animateSquareRight(sender: UIButton) {
+        let oldOffset = blueSquareCenterXConstraint.constant
+        blueSquareCenterXConstraint.constant = oldOffset + CGFloat(distanceStepper.value)
+        UIView.animate(withDuration: durationStepper.value) { [unowned self] in
             self.view.layoutIfNeeded()
         }
     }
@@ -121,6 +147,8 @@ class ViewController: UIViewController {
         addStackViewSubviews()
         view.addSubview(buttonStackView)
         view.addSubview(leftRightStackView)
+        view.addSubview(durationStepper)
+        view.addSubview(distanceStepper)
     }
     
     private func addStackViewSubviews() {
@@ -138,6 +166,24 @@ class ViewController: UIViewController {
         constrainLeftButton()
         constrainRightButton()
         constrainLeftRightButtonStackView()
+        constrainDurationStepper()
+        constrainDistanceStepper()
+    }
+    
+    private func constrainDurationStepper() {
+        durationStepper.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            durationStepper.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            durationStepper.topAnchor.constraint(equalTo: view.topAnchor, constant: 80)
+        ])
+    }
+    
+    private func constrainDistanceStepper() {
+        distanceStepper.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            distanceStepper.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            distanceStepper.topAnchor.constraint(equalTo: durationStepper.bottomAnchor, constant: 20)
+        ])
     }
     
     private func constrainUpButton() {
